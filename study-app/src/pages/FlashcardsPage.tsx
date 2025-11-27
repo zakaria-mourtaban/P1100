@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { flashcards, chapters } from '@/data/courseData'
+import { LatexText } from '@/components/Latex'
 import { ChevronLeft, ChevronRight, RotateCw, Shuffle } from 'lucide-react'
 
 export function FlashcardsPage() {
@@ -113,9 +114,9 @@ export function FlashcardsPage() {
               <Badge variant="outline" className="mb-4">
                 {isFlipped ? 'Answer' : 'Question'}
               </Badge>
-              <p className="text-xl font-medium leading-relaxed">
-                {isFlipped ? currentCard.back : currentCard.front}
-              </p>
+              <div className="text-xl font-medium leading-relaxed">
+                <LatexText>{isFlipped ? currentCard.back : currentCard.front}</LatexText>
+              </div>
               <p className="text-sm text-muted-foreground mt-6">
                 Click to {isFlipped ? 'see question' : 'reveal answer'}
               </p>

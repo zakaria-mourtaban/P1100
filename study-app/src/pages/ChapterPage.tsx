@@ -3,8 +3,9 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { FileText, ExternalLink, BookOpen, PenTool } from 'lucide-react'
+import { FileText, ExternalLink, BookOpen, PenTool, Lightbulb, CheckCircle } from 'lucide-react'
 import { usePDFViewerContext } from '@/contexts/PDFViewerContext'
+import { LatexText, Formula } from '@/components/Latex'
 import type { Chapter } from '@/data/courseData'
 
 interface ChapterPageProps {
@@ -70,18 +71,51 @@ export function ChapterPage({ chapter }: ChapterPageProps) {
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-4 pl-4">
-                    <p className="text-muted-foreground leading-relaxed">
-                      {topic.content}
-                    </p>
+                    {/* Summary */}
+                    <div className="text-muted-foreground leading-relaxed">
+                      <LatexText>{topic.content}</LatexText>
+                    </div>
                     
+                    {/* Detailed Explanation */}
+                    {topic.explanation && (
+                      <div className="space-y-2 p-4 bg-blue-500/5 dark:bg-blue-500/10 rounded-lg border border-blue-500/20">
+                        <h4 className="font-semibold text-sm flex items-center gap-2 text-blue-600 dark:text-blue-400">
+                          <Lightbulb className="h-4 w-4" />
+                          Understanding the Concept
+                        </h4>
+                        <div className="text-sm leading-relaxed whitespace-pre-line">
+                          <LatexText>{topic.explanation}</LatexText>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Key Points */}
+                    {topic.keyPoints && topic.keyPoints.length > 0 && (
+                      <div className="space-y-2">
+                        <h4 className="font-semibold text-sm flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                          Key Points
+                        </h4>
+                        <ul className="space-y-1.5 text-sm">
+                          {topic.keyPoints.map((point, pIdx) => (
+                            <li key={pIdx} className="flex items-start gap-2">
+                              <span className="text-green-500 mt-1">•</span>
+                              <span className="flex-1">
+                                <LatexText>{point}</LatexText>
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {/* Formulas */}
                     {topic.formulas && topic.formulas.length > 0 && (
                       <div className="space-y-2">
                         <h4 className="font-semibold text-sm">Key Formulas:</h4>
                         <div className="grid gap-2">
                           {topic.formulas.map((formula, fIdx) => (
-                            <div key={fIdx} className="formula">
-                              {formula}
-                            </div>
+                            <Formula key={fIdx} formula={formula} />
                           ))}
                         </div>
                       </div>
@@ -138,12 +172,14 @@ export function ChapterPage({ chapter }: ChapterPageProps) {
                   </CardHeader>
                   <CardContent>
                     <CardDescription className="text-foreground/80">
-                      {exercise.problem}
+                      <LatexText>{exercise.problem}</LatexText>
                     </CardDescription>
                     {exercise.solution && (
                       <div className="mt-4 p-4 bg-success/10 rounded-lg border border-success/20">
                         <h4 className="font-semibold text-sm mb-2 text-success">Solution:</h4>
-                        <p className="text-sm">{exercise.solution}</p>
+                        <div className="text-sm">
+                          <LatexText>{exercise.solution}</LatexText>
+                        </div>
                       </div>
                     )}
                   </CardContent>
