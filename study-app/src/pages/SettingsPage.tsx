@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { pdfCache, formatBytes, type PDFInfo } from '@/lib/pdfCache'
 import { studyProgress } from '@/lib/studyProgress'
-import { pdfFiles } from '@/data/courseData'
+import { pdfFiles } from '@/data'
 import { 
   HardDrive, 
   Trash2, 

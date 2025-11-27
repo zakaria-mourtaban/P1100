@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { flashcards, chapters } from '@/data/courseData'
+import { flashcards, chapters } from '@/data'
 import { LatexText } from '@/components/Latex'
 import { ChevronLeft, ChevronRight, RotateCw, Shuffle } from 'lucide-react'
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Button } from './ui/button'
 import { Progress } from './ui/progress'
 import { pdfCache, formatBytes } from '@/lib/pdfCache'
-import { pdfFiles } from '@/data/courseData'
+import { pdfFiles } from '@/data'
 import { 
   Download, 
   CheckCircle2, 

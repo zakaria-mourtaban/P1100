@@ -5,8 +5,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { FileText, ExternalLink, BookOpen, PenTool, Lightbulb, CheckCircle } from 'lucide-react'
 import { usePDFViewerContext } from '@/contexts/PDFViewerContext'
-import { LatexText, Formula } from '@/components/Latex'
-import type { Chapter } from '@/data/courseData'
+import { LatexText, Formula, MarkdownLatex } from '@/components/Latex'
+import type { Chapter } from '@/data'
 
 interface ChapterPageProps {
   chapter: Chapter
@@ -83,8 +83,8 @@ export function ChapterPage({ chapter }: ChapterPageProps) {
                           <Lightbulb className="h-4 w-4" />
                           Understanding the Concept
                         </h4>
-                        <div className="text-sm leading-relaxed whitespace-pre-line">
-                          <LatexText>{topic.explanation}</LatexText>
+                        <div className="text-sm leading-relaxed">
+                          <MarkdownLatex>{topic.explanation}</MarkdownLatex>
                         </div>
                       </div>
                     )}

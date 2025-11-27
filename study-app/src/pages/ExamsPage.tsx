@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { exams } from '@/data/courseData'
+import { exams } from '@/data'
 import { usePDFViewerContext } from '@/contexts/PDFViewerContext'
 import { FileText, ExternalLink } from 'lucide-react'
 

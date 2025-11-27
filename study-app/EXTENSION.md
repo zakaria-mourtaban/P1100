@@ -5,8 +5,8 @@ This guide explains how to extend this study app for a new subject or course mat
 ## Quick Start for New Subject
 
 1. **Copy the project folder** to a new location
-2. **Add your PDFs** to the parent directory
-3. **Update course data** in `src/data/courseData.ts`
+2. **Add your PDFs** to the `public/pdfs/` directory
+3. **Update course data** in the `src/data/` files
 4. **Customize styling** if needed in `src/index.css`
 
 ## Project Structure
@@ -15,124 +15,168 @@ This guide explains how to extend this study app for a new subject or course mat
 study-app/
 ├── src/
 │   ├── components/
-│   │   ├── ui/           # Reusable UI components
-│   │   ├── Latex.tsx     # LaTeX rendering components
+│   │   ├── ui/           # Reusable UI components (button, card, etc.)
+│   │   ├── Latex.tsx     # LaTeX & Markdown rendering components
 │   │   ├── Sidebar.tsx   # Navigation sidebar
 │   │   └── PDFViewer.tsx # In-app PDF viewer
 │   ├── data/
-│   │   └── courseData.ts # Course content definitions
+│   │   ├── index.ts      # Main export file (re-exports all data)
+│   │   ├── types.ts      # TypeScript interfaces
+│   │   ├── chapters.ts   # All chapter content with topics & exercises
+│   │   ├── flashcards.ts # Flashcard definitions
+│   │   └── resources.ts  # PDF files and exam definitions
 │   ├── pages/
-│   │   ├── HomePage.tsx      # Dashboard
+│   │   ├── HomePage.tsx      # Dashboard with progress
 │   │   ├── ChapterPage.tsx   # Chapter content view
-│   │   ├── FlashcardsPage.tsx # Flashcard study
+│   │   ├── FlashcardsPage.tsx # Flashcard study mode
 │   │   ├── ExamsPage.tsx     # Past exams list
-│   │   └── PdfsPage.tsx      # PDF library
+│   │   └── PdfsPage.tsx      # PDF library browser
 │   ├── lib/
 │   │   ├── pdfCache.ts   # PDF caching with IndexedDB
 │   │   └── utils.ts      # Utility functions
 │   ├── App.tsx           # Main app component
-│   └── index.css         # Global styles
-└── public/pdfs/          # PDF files for GitHub Pages deployment
+│   └── index.css         # Global styles & theme
+└── public/pdfs/          # PDF files for deployment
 ```
 
-## Adding Course Content
+## Data Organization
 
-### Step 1: Define Data Structures
+Course data is split into logical files for easier maintenance:
 
-The main data file is `src/data/courseData.ts`. Key interfaces:
+### `src/data/types.ts` - Type Definitions
+
+All TypeScript interfaces are defined here:
 
 ```typescript
 interface Topic {
   id: string;           // Unique identifier (e.g., "ch1-t1")
   title: string;        // Topic title
-  content: string;      // Brief summary with inline LaTeX ($...$)
-  explanation?: string; // Detailed 10th-grader friendly explanation
-  keyPoints?: string[]; // Bullet points with inline LaTeX
-  formulas?: string[];  // List of key formulas in LaTeX (display mode)
-  diagrams?: {          // Optional visual aids
-    type: 'latex' | 'mermaid';
-    content: string;
-  }[];
-  pdfRef?: {            // Reference to source PDF
-    file: string;       // PDF filename
-    page: number;       // Page number
-  };
-}
-
-interface Exercise {
-  id: string;
-  title: string;
-  problem: string;      // Problem statement (supports LaTeX)
-  solution?: string;    // Solution if available (supports LaTeX)
+  content: string;      // Brief summary (supports $latex$)
+  explanation?: string; // Detailed markdown explanation with $latex$
+  keyPoints?: string[]; // Bullet points (supports $latex$)
+  formulas?: string[];  // Display-mode LaTeX formulas
+  diagrams?: { type: 'latex' | 'mermaid'; content: string; }[];
   pdfRef?: { file: string; page: number };
 }
 
-interface Chapter {
-  id: string;           // Unique ID (e.g., "chapter1")
-  number: number;       // Chapter number
-  title: string;        // Chapter title
-  icon: string;         // Lucide icon name
-  description: string;  // Brief description
-  topics: Topic[];      // List of topics
-  exercises: Exercise[];
-  pdfs: string[];       // Related PDF files
-}
+interface Chapter { ... }
+interface Exercise { ... }
+interface Flashcard { ... }
+interface PdfFile { ... }
+interface Exam { ... }
+```
 
-interface Flashcard {
-  id: string;
-  front: string;        // Question (supports LaTeX)
-  back: string;         // Answer (supports LaTeX)
-  chapter: string;      // Chapter ID for filtering
-}
+### `src/data/chapters.ts` - Chapter Content
 
-interface PdfFile {
-  id: string;
-  title: string;
-  file: string;
-  type: 'lecture' | 'tutorial' | 'exam' | 'other';
-  chapter?: string;     // Category for grouping
+Contains all chapters with their topics and exercises. This is the main content file.
+
+### `src/data/flashcards.ts` - Flashcards
+
+All flashcard definitions organized by chapter.
+
+### `src/data/resources.ts` - PDFs & Exams
+
+PDF file listings and exam definitions.
+
+### `src/data/index.ts` - Main Export
+
+Re-exports everything for convenient importing:
+
+```typescript
+// Import from the data index
+import { chapters, flashcards, exams, pdfFiles } from '@/data'
+import type { Chapter, Topic, Flashcard } from '@/data'
+```
+
+## Writing Content with Markdown + LaTeX
+
+### The MarkdownLatex Component
+
+Explanations now support **full Markdown** with embedded LaTeX. Use the `MarkdownLatex` component:
+
+```tsx
+import { MarkdownLatex } from '@/components/Latex'
+
+<MarkdownLatex>{topic.explanation}</MarkdownLatex>
+```
+
+Supported features:
+- **Bold**, *italic*, ~~strikethrough~~
+- Headers (##, ###)
+- Bullet lists and numbered lists
+- Tables
+- Code blocks with syntax highlighting
+- Inline LaTeX with `$...$`
+- Display LaTeX with `$$...$$`
+- Blockquotes
+
+### Writing Explanations (Markdown + LaTeX)
+
+```typescript
+{
+  id: "ch2-t1",
+  title: "Newton's Second Law",
+  explanation: `## The Big Idea
+
+**Newton's Second Law** connects three quantities: force, mass, and acceleration.
+
+### The Formula
+
+$$\\sum\\vec{F} = m\\vec{a}$$
+
+This means:
+- More force → more acceleration
+- More mass → less acceleration
+
+### Real-World Example
+
+Imagine pushing a shopping cart:
+| Cart Status | Mass | Same Push | Acceleration |
+|-------------|------|-----------|--------------|
+| Empty | Low | 10 N | Fast |
+| Full | High | 10 N | Slow |
+
+The formula $F = ma$ explains this perfectly!`
 }
 ```
 
-## Writing Content with LaTeX
-
-### LaTeX Components
-
-The app uses KaTeX for rendering mathematical formulas. Three components are available:
+### LaTeX Components Reference
 
 ```tsx
-import { Latex, LatexText, Formula } from '@/components/Latex'
-
-// 1. Latex - Render pure LaTeX
+// 1. Pure LaTeX rendering
 <Latex>E = mc^2</Latex>
 <Latex displayMode>\\frac{d}{dx}\\sin(x) = \\cos(x)</Latex>
 
-// 2. LatexText - Mixed text with inline LaTeX
-<LatexText>The formula $F = ma$ describes Newton's Second Law.</LatexText>
+// 2. Text with inline $...$ LaTeX (no markdown)
+<LatexText>The formula $F = ma$ describes the law.</LatexText>
 
-// 3. Formula - Styled formula block for lists
-<Formula formula="$\\vec{F} = m\\vec{a}$" />
+// 3. Full markdown with LaTeX support
+<MarkdownLatex>{markdownContent}</MarkdownLatex>
+
+// 4. Styled formula block for formula lists
+<Formula formula="\\vec{F} = m\\vec{a}" />
 ```
 
-### Writing Formulas in courseData.ts
+### When to Use Each Component
 
-**Important:** In TypeScript strings, backslashes must be escaped!
+| Component | Use Case | Supports |
+|-----------|----------|----------|
+| `Latex` | Pure math formulas | KaTeX only |
+| `LatexText` | Short text with formulas | Inline `$...$` |
+| `MarkdownLatex` | Explanations, long content | Full Markdown + `$...$` + `$$...$$` |
+| `Formula` | Formula display lists | Display-mode KaTeX |
+
+### Escaping in TypeScript Strings
+
+**Important:** In TypeScript template literals and strings, backslashes must be escaped!
 
 ```typescript
 // ❌ Wrong - single backslash
-formulas: ["$\vec{F} = m\vec{a}$"]
+formulas: ["\\vec{F} = m\\vec{a}"]  // Will break
 
 // ✅ Correct - double backslash
-formulas: ["$\\vec{F} = m\\vec{a}$"]
+formulas: ["\\\\vec{F} = m\\\\vec{a}"]
 ```
-
-### Inline vs Display LaTeX
-
-- **Inline** (`$...$`): Use for formulas within text
-  - Example: `"The momentum is $p = mv$."`
-  
-- **Display** (formulas array): Use for standalone key formulas
-  - Example: `formulas: ["$\\vec{p} = m\\vec{v}$"]`
 
 ### Common LaTeX Commands
 
@@ -160,80 +204,6 @@ x_0, v^2              → x₀, v²
 \\cdot (dot product), \\times (cross product)
 \\text{text} (for text within equations)
 ```
-
-## Writing Explanations
-
-### Philosophy: Make it Understandable for a 10th Grader
-
-When writing the `explanation` field:
-
-1. **Start with the intuition** - What is this concept in everyday terms?
-2. **Use analogies** - Connect to familiar experiences
-3. **Build step by step** - Don't assume prior knowledge
-4. **Explain the "why"** - Not just the formula, but why it works
-5. **Include examples** - Real-world applications help understanding
-
-### Example Structure
-
-```typescript
-{
-  id: "ch2-t1",
-  title: "Newton's Second Law",
-  content: "The net force on an object equals its mass times acceleration: $\\sum\\vec{F} = m\\vec{a}$.",
-  explanation: `Newton's Second Law is like a recipe that connects three ingredients: force, mass, and acceleration.
-
-Imagine pushing a shopping cart. If the cart is empty (small mass), a small push makes it accelerate quickly. But if the cart is full of groceries (large mass), you need a much bigger push to get the same acceleration.
-
-The formula $\\sum\\vec{F} = m\\vec{a}$ tells us:
-• More force → more acceleration
-• More mass → less acceleration (for the same force)
-
-The $\\sum$ symbol means "sum of all forces." If multiple forces act on an object, you add them up (as vectors) to find the net force.`,
-  keyPoints: [
-    "$\\sum\\vec{F} = m\\vec{a}$ - net force = mass × acceleration",
-    "Force and acceleration are vectors (have direction)",
-    "Mass is a scalar (magnitude only)",
-    "Units: force in Newtons (N), mass in kg, acceleration in m/s²"
-  ],
-  formulas: [
-    "$\\sum\\vec{F} = m\\vec{a}$",
-    "$F = ma$ (scalar form)"
-  ]
-}
-```
-
-## Diagrams
-
-### Mermaid Diagrams
-
-For flowcharts, state diagrams, or concept maps, use Mermaid:
-
-```typescript
-diagrams: [
-  {
-    type: 'mermaid',
-    content: `graph TD
-      A[Force Applied] --> B{Object Mass}
-      B -->|Light| C[High Acceleration]
-      B -->|Heavy| D[Low Acceleration]`
-  }
-]
-```
-
-### LaTeX Diagrams
-
-For mathematical diagrams (coordinate systems, vectors), use TikZ-style descriptions that can be rendered:
-
-```typescript
-diagrams: [
-  {
-    type: 'latex',
-    content: `Vector diagram showing $\\vec{F}_1 + \\vec{F}_2 = \\vec{F}_{net}$`
-  }
-]
-```
-
-*Note: Full TikZ support requires additional implementation. Currently, describe diagrams in text.*
 
 ## Available Icons
 

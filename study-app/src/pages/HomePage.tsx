@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
-import { chapters } from '@/data/courseData'
+import { chapters } from '@/data'
 import { BookOpen, Target, Clock, ArrowRight } from 'lucide-react'
 import type { PageType } from '@/App'
 

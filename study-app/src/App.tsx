@@ -9,7 +9,7 @@ import { SettingsPage } from './pages/SettingsPage'
 import { PDFViewer } from './components/PDFViewer'
 import { PDFPreloadDialog } from './components/PDFPreloadDialog'
 import { PDFViewerContext } from './contexts/PDFViewerContext'
-import { chapters, pdfFiles } from './data/courseData'
+import { chapters, pdfFiles } from './data'
 import { studyProgress } from './lib/studyProgress'
 import { pdfCache } from './lib/pdfCache'
 
