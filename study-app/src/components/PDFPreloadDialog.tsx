@@ -277,8 +277,19 @@ export function PDFPreloadDialog({ onComplete }: PDFPreloadDialogProps) {
       </main>
 
       {/* Footer */}
-      <footer className="p-4 border-t border-border bg-card text-center text-sm text-muted-foreground">
-        Lebanese University • Faculty of Sciences, B3
+      <footer className="p-4 border-t border-border bg-card text-center text-sm text-muted-foreground space-y-1">
+        <p>Lebanese University • Faculty of Sciences, B3</p>
+        <p>
+          Found inaccurate information?{' '}
+          <a 
+            href="https://github.com/zakaria-mourtaban/P1100/issues" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-primary hover:underline"
+          >
+            Open an issue on GitHub
+          </a>
+        </p>
       </footer>
     </div>
   )
