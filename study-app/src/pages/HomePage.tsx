@@ -1,15 +1,11 @@
+import { Link } from 'react-router-dom'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { chapters } from '@/data'
 import { BookOpen, Target, Clock, ArrowRight } from 'lucide-react'
-import type { PageType } from '@/App'
 
-interface HomePageProps {
-  onNavigate: (page: PageType) => void
-}
-
-export function HomePage({ onNavigate }: HomePageProps) {
+export function HomePage() {
   const totalTopics = chapters.reduce((acc, ch) => acc + ch.topics.length, 0)
   const totalExercises = chapters.reduce((acc, ch) => acc + ch.exercises.length, 0)
 
@@ -80,47 +76,53 @@ export function HomePage({ onNavigate }: HomePageProps) {
         <h2 className="text-2xl font-bold mb-4">Course Chapters</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {chapters.map((chapter) => (
-            <Card key={chapter.id} className="hover:border-primary/50 transition-colors cursor-pointer group" onClick={() => onNavigate(chapter.id)}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">
-                    Chapter {chapter.number}: {chapter.title}
-                  </CardTitle>
-                </div>
-                <CardDescription>{chapter.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <span>{chapter.topics.length} topics</span>
-                  <span>{chapter.exercises.length} exercises</span>
-                </div>
-                <Button variant="ghost" size="sm" className="w-full mt-4 group-hover:bg-primary group-hover:text-primary-foreground">
-                  Study Chapter <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </CardContent>
-            </Card>
+            <Link key={chapter.id} to={`/chapter/${chapter.id}`}>
+              <Card className="hover:border-primary/50 transition-colors cursor-pointer group h-full">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg">
+                      Chapter {chapter.number}: {chapter.title}
+                    </CardTitle>
+                  </div>
+                  <CardDescription>{chapter.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <span>{chapter.topics.length} topics</span>
+                    <span>{chapter.exercises.length} exercises</span>
+                  </div>
+                  <Button variant="ghost" size="sm" className="w-full mt-4 group-hover:bg-primary group-hover:text-primary-foreground">
+                    Study Chapter <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
       </div>
 
       {/* Quick Links */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="cursor-pointer hover:border-primary/50 transition-colors" onClick={() => onNavigate('flashcards')}>
-          <CardHeader>
-            <CardTitle>📚 Flashcards</CardTitle>
-            <CardDescription>
-              Review key concepts with interactive flashcards. Perfect for quick revision before exams.
-            </CardDescription>
-          </CardHeader>
-        </Card>
-        <Card className="cursor-pointer hover:border-primary/50 transition-colors" onClick={() => onNavigate('exams')}>
-          <CardHeader>
-            <CardTitle>📝 Past Exams</CardTitle>
-            <CardDescription>
-              Practice with previous exam papers and solutions to prepare for your tests.
-            </CardDescription>
-          </CardHeader>
-        </Card>
+        <Link to="/flashcards">
+          <Card className="cursor-pointer hover:border-primary/50 transition-colors h-full">
+            <CardHeader>
+              <CardTitle>📚 Flashcards</CardTitle>
+              <CardDescription>
+                Review key concepts with interactive flashcards. Perfect for quick revision before exams.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+        <Link to="/exams">
+          <Card className="cursor-pointer hover:border-primary/50 transition-colors h-full">
+            <CardHeader>
+              <CardTitle>📝 Past Exams</CardTitle>
+              <CardDescription>
+                Practice with previous exam papers and solutions to prepare for your tests.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
       </div>
     </div>
   )

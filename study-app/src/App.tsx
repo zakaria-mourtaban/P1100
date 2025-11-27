@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
+import { Routes, Route, useParams } from 'react-router-dom'
 import { Sidebar } from './components/Sidebar'
 import { HomePage } from './pages/HomePage'
 import { ChapterPage } from './pages/ChapterPage'
@@ -13,12 +14,32 @@ import { chapters, pdfFiles } from './data'
 import { studyProgress } from './lib/studyProgress'
 import { pdfCache } from './lib/pdfCache'
 
-export type PageType = 'home' | 'flashcards' | 'exams' | 'pdfs' | 'settings' | string
-
 const PRELOAD_COMPLETE_KEY = 'studyApp_preloadComplete'
 
+// Wrapper component for chapter pages with dynamic routing
+function ChapterPageWrapper() {
+  const { chapterId } = useParams<{ chapterId: string }>()
+  const chapter = chapters.find(c => c.id === chapterId)
+  
+  useEffect(() => {
+    if (chapter) {
+      studyProgress.markChapterViewed(chapter.id)
+    }
+  }, [chapter])
+  
+  if (!chapter) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-2xl font-bold mb-4">Chapter Not Found</h2>
+        <p className="text-muted-foreground">The requested chapter does not exist.</p>
+      </div>
+    )
+  }
+  
+  return <ChapterPage chapter={chapter} />
+}
+
 function App() {
-  const [currentPage, setCurrentPage] = useState<PageType>('home')
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [showPreloadDialog, setShowPreloadDialog] = useState(true)
   const [isCheckingCache, setIsCheckingCache] = useState(true)
@@ -68,23 +89,6 @@ function App() {
     setPdfViewer(prev => ({ ...prev, isOpen: false }))
   }, [])
 
-  const renderPage = () => {
-    if (currentPage === 'home') return <HomePage onNavigate={setCurrentPage} />
-    if (currentPage === 'flashcards') return <FlashcardsPage />
-    if (currentPage === 'exams') return <ExamsPage />
-    if (currentPage === 'pdfs') return <PdfsPage />
-    if (currentPage === 'settings') return <SettingsPage />
-    
-    const chapter = chapters.find(c => c.id === currentPage)
-    if (chapter) {
-      // Track chapter view
-      studyProgress.markChapterViewed(chapter.id)
-      return <ChapterPage chapter={chapter} />
-    }
-    
-    return <HomePage onNavigate={setCurrentPage} />
-  }
-
   // Show nothing while checking cache
   if (isCheckingCache) {
     return null
@@ -99,14 +103,19 @@ function App() {
     <PDFViewerContext.Provider value={{ openPDF }}>
       <div className="flex min-h-screen bg-background">
         <Sidebar 
-          currentPage={currentPage} 
-          onNavigate={setCurrentPage}
           isOpen={sidebarOpen}
           onToggle={() => setSidebarOpen(!sidebarOpen)}
         />
         <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-16'}`}>
           <div className="p-6">
-            {renderPage()}
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/chapter/:chapterId" element={<ChapterPageWrapper />} />
+              <Route path="/flashcards" element={<FlashcardsPage />} />
+              <Route path="/exams" element={<ExamsPage />} />
+              <Route path="/pdfs" element={<PdfsPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+            </Routes>
           </div>
         </main>
         
