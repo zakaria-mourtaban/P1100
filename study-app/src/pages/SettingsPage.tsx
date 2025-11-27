@@ -95,6 +95,7 @@ export function SettingsPage() {
     })
 
     const errors: string[] = []
+    const baseUrl = import.meta.env.BASE_URL || '/'
 
     for (let i = 0; i < filesToDownload.length; i++) {
       const filename = filesToDownload[i]
@@ -105,7 +106,7 @@ export function SettingsPage() {
       }))
 
       try {
-        const response = await fetch(`/pdfs/${encodeURIComponent(filename)}`)
+        const response = await fetch(`${baseUrl}pdfs/${encodeURIComponent(filename)}`)
         if (!response.ok) throw new Error(`HTTP ${response.status}`)
         const data = await response.arrayBuffer()
         await pdfCache.set(filename, data)

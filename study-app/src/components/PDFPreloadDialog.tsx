@@ -73,6 +73,7 @@ export function PDFPreloadDialog({ onComplete }: PDFPreloadDialogProps) {
     
     const errorList: string[] = []
     let totalBytes = 0
+    const baseUrl = import.meta.env.BASE_URL || '/'
 
     for (let i = 0; i < filesToDownload.length; i++) {
       const file = filesToDownload[i]
@@ -81,7 +82,7 @@ export function PDFPreloadDialog({ onComplete }: PDFPreloadDialogProps) {
 
       try {
         // Fetch with progress tracking
-        const response = await fetch(`/pdfs/${encodeURIComponent(file.filename)}`)
+        const response = await fetch(`${baseUrl}pdfs/${encodeURIComponent(file.filename)}`)
         if (!response.ok) throw new Error(`HTTP ${response.status}`)
         
         const data = await response.arrayBuffer()

@@ -84,7 +84,8 @@ export function PDFViewer({ filename, initialPage = 1, onClose }: PDFViewerProps
   const zoomOut = () => setScale(prev => Math.max(0.5, prev - 0.2))
 
   const handleDownload = () => {
-    window.open(`/pdfs/${encodeURIComponent(filename)}`, '_blank')
+    const baseUrl = import.meta.env.BASE_URL || '/'
+    window.open(`${baseUrl}pdfs/${encodeURIComponent(filename)}`, '_blank')
   }
 
   const toggleFullscreen = () => {

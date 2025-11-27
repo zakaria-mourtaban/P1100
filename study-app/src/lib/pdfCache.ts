@@ -203,6 +203,9 @@ class PDFCache {
 
 export const pdfCache = new PDFCache()
 
+// Get the base URL for assets (handles both dev and production)
+const getBaseUrl = () => import.meta.env.BASE_URL || '/'
+
 // Utility to fetch and cache a PDF
 export async function fetchAndCachePDF(filename: string): Promise<ArrayBuffer> {
   // Check cache first
@@ -214,7 +217,8 @@ export async function fetchAndCachePDF(filename: string): Promise<ArrayBuffer> {
 
   // Fetch from server
   console.log(`[PDF Cache] Miss: ${filename}, fetching...`)
-  const response = await fetch(`/pdfs/${encodeURIComponent(filename)}`)
+  const baseUrl = getBaseUrl()
+  const response = await fetch(`${baseUrl}pdfs/${encodeURIComponent(filename)}`)
   if (!response.ok) {
     throw new Error(`Failed to fetch PDF: ${filename}`)
   }
@@ -232,7 +236,8 @@ export async function fetchAndCachePDF(filename: string): Promise<ArrayBuffer> {
 // Get size of a remote PDF without downloading it fully
 export async function getPDFSize(filename: string): Promise<number> {
   try {
-    const response = await fetch(`/pdfs/${encodeURIComponent(filename)}`, {
+    const baseUrl = getBaseUrl()
+    const response = await fetch(`${baseUrl}pdfs/${encodeURIComponent(filename)}`, {
       method: 'HEAD'
     })
     const contentLength = response.headers.get('content-length')
